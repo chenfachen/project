@@ -93,7 +93,7 @@ def adddesip():
         else:
             continue
 
-def Edelay(ip):
+def Edelay(ip,i):
     dict = {}
     command_delay = 'ping ' + ip + ' -c 1 | grep from'
     delay_message = os.popen(command_delay).read()
@@ -102,11 +102,13 @@ def Edelay(ip):
     else:
         delay = delay_message.split('time=')[1].split()[0]
         nbrnum = str(ip).split('.')[-1]
-        dict[str((hostnum, nbrnum))] = delay
-
+        #dict[str((hostnum, nbrnum))] = delay
+        dict['sourceNode'] = hostname.strip()
+        dict['desNode'] = feature_ping[i][2]
+        dict['dalay'] = delay
         j = json.dumps(dict)
         #save the data to elasticseearch
-        index_name=hostname.strip()+'-delay'
+        index_name='delay'
         es = Elasticsearch("114.212.112.36", http_auth=('elastic', 'password'), port=9206)
         if es.indices.exists(index=index_name):
             result = es.index(index=index_name, doc_type='doc', body=j)
@@ -118,16 +120,19 @@ def Edelay(ip):
         print(result)
 
 
-def Eloss(ip):
+def Eloss(ip,i):
     dict = {}
     command_loss = 'iperf -c ' + ip + ' -u -t 1 -b 2M -y C | head -n 2 | tail -n 1'
     loss_message = os.popen(command_loss).read()
     loss = loss_message.split(',')[12]
     nbrnum = str(ip).split('.')[-1]
-    dict[str((hostnum, nbrnum))] = loss
+    #dict[str((hostnum, nbrnum))] = loss
+    dict['sourceNode'] = hostname.strip()
+    dict['desNode'] = feature_ping[i][2]
+    dict['loss'] = loss
     j = json.dumps(dict)
     #save the data to elasticseearch
-    index_name=hostname.strip()+'-loss'
+    index_name='loss'
     es = Elasticsearch("114.212.112.36", http_auth=('elastic', 'password'), port=9206)
     if es.indices.exists(index=index_name):
         result = es.index(index=index_name, doc_type='doc', body=j)
@@ -139,26 +144,21 @@ def Eloss(ip):
     print(result)
 
 def main_v1():
-    mysql = MYSQL('114.212.112.36', 'root', '123456', 'communication')
-    mysql.connect()
-    feature = mysql.fetchAll("sourceport,sourceip,destport,destip", 'ping')
+    adddesip()
     thread_pool = ThreadPoolExecutor(max_workers=2)
-    for i in range(0, len(feature)):
-        if feature[i][2] == hostname.strip():       #desnode
-            os.system('iperf -s -u -B {} &'.format(feature[i][3]))
+    for i in range(0, len(feature_ping)):
+        if feature_ping[i][2] == hostname.strip():       #desnode
+            os.system('iperf -s -u -B {} &'.format(feature_ping[i][3]))
             break
         else:
             continue
-    for i in range(0,len(feature)):
-        if feature[i][0] == hostname.strip():
+    for i in range(0,len(feature_ping)):
+        if feature_ping[i][0] == hostname.strip():
             while True:
                 for ip in hosts:
-                    thread_pool.submit(Edelay, ip)
-                    thread_pool.submit(Eloss, ip)
+                    thread_pool.submit(Edelay, ip, i)
+                    thread_pool.submit(Eloss, ip, i)
 
-def func_ping():
-    adddesip()
-    main_v1()
 
 #next is v2
 def preInThroughput():
@@ -485,22 +485,6 @@ def main_v2(counter):
             continue
 
 def func_snmp():
-    # start = time.time()
-
-    '''try:
-        db = pymysql.connect('114.212.112.36', 'root', '123456', 'STARTTIME')
-        print("connect successful")
-    except pymysql.Error as e:
-        print("fail to connect mysql" + str(e))
-    cur = db.cursor()
-    selecttime = cur.execute("SELECT time FROM Time ORDER BY id DESC LIMIT 0,1")
-    results = cur.fetchall()
-    for row in results:
-        time_start = row[0]
-        print(time_start)
-    time_cur = float(time.time())
-    time_sleep = float(time_start) - time_cur
-    time.sleep(time_sleep)'''
 
     preInThroughput()
     preOutThroughput()
@@ -602,9 +586,7 @@ def func_tc():
     # localname = 'leo1'
 
     # 连接数据库
-    mysql = MYSQL('114.212.112.36', 'root', '123456', 'communication')
-    mysql.connect()
-    feature = mysql.fetchAll("sourceport,destport,destip,delaytime,packetlossrate,time", 'linkfeature_table')
+    feature = mysql.fetchAll("sourceport,destport,destip,delaytime,packetlossrate,time", 'lalala')
     #    sourceport,destport,destip:vchar,delaytime:double,packetlossrate:double,time:int
     #    print(feature)
 
@@ -743,8 +725,27 @@ def func_tc():
 if __name__ == '__main__':
     hostname = os.popen('echo $HOSTNAME').read()
     hostnum = re.findall('\d+', hostname)[0]
+    mysql = MYSQL('114.212.112.36', 'root', '123456', 'communication')
+    mysql.connect()
+    feature_ping = mysql.fetchAll("sourceport,sourceip,destport,destip", 'ping')
+
+    '''try:
+         db = pymysql.connect('114.212.112.36', 'root', '123456', 'STARTTIME')
+         print("connect successful")
+     except pymysql.Error as e:
+         print("fail to connect mysql" + str(e))
+     cur = db.cursor()
+     selecttime = cur.execute("SELECT time FROM Time ORDER BY id DESC LIMIT 0,1")
+     results = cur.fetchall()
+     for row in results:
+         time_start = row[0]
+         print(time_start)
+     time_cur = float(time.time())
+     time_sleep = float(time_start) - time_cur
+     time.sleep(time_sleep)'''
+
     threads = []
-    threads.append(threading.Thread(target=func_ping))
+    threads.append(threading.Thread(target=main_v1))
     threads.append(threading.Thread(target=func_snmp))
     threads.append(threading.Thread(target=func_tc))
     for t in threads:
