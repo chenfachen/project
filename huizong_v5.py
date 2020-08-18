@@ -776,8 +776,8 @@ def mk_cfg():
         conf.set("MobileNodeAgent", "IF_GATEWAYS", if_gateways)
 
         conf.write(cfgfile)
-
         cfgfile.close()
+        os.system('sysctl net.ipv4.conf.all.rp_filter=2')
 
         else:
         c5 = db1.cursor()
@@ -813,6 +813,7 @@ def mk_cfg():
 
         cfgfile.close()
         os.system('python home_agent.py ha.cfg &')
+        os.system('sysctl net.ipv4.conf.all.rp_filter=2')
 
     db1.close()
 
