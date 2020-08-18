@@ -719,99 +719,100 @@ def mk_cfg():
     db1 = pymysql.connect("114.212.112.36", "root", "123456","communication")
 
     if 'leo' in hostname:
-	    c1 = db1.cursor()
-	    c1.execute("select * from link_table1 where destport like '%s' AND sourcetype='geo'"%hostname)
-	    leo_links = c1.fetchall()
-	    c2 = db1.cursor()
-	    c2.execute("select * from link_table1 where sourceport like '%s' AND desttype='geo'"%hostname)
-	    leo_links += c2.fetchall()
+        c1 = db1.cursor()
+        c1.execute("select * from link_table1 where destport like '%s' AND sourcetype='geo'"%hostname)
+        leo_links = c1.fetchall()
+        c2 = db1.cursor()
+        c2.execute("select * from link_table1 where sourceport like '%s' AND desttype='geo'"%hostname)
+        leo_links += c2.fetchall()
 
 
-	    #use id in link_table1 
-	    c3 = db1.cursor()
-	    leo_flow0=[]
-	    for i in range(len(leo_links)):
-	        c3.execute("select * from flow_table1 where link_id=%s and starttime=0"%leo_links[i][0])
-	        leo_flow0+=c3.fetchall()
+        #use id in link_table1
+        c3 = db1.cursor()
+        leo_flow0=[]
+        for i in range(len(leo_links)):
+            c3.execute("select * from flow_table1 where link_id=%s and starttime=0"%leo_links[i][0])
+            leo_flow0+=c3.fetchall()
 
-	    c4 = db1.cursor()
-	    c4.execute("select * from link_table1 where id=%s"%leo_flow0[0][1])
-	    leo_link0=c4.fetchall()
+        c4 = db1.cursor()
+        c4.execute("select * from link_table1 where id=%s"%leo_flow0[0][1])
+        leo_link0=c4.fetchall()
 
-	    if leo_link0[0][5]=='geo':
-	        home_agent_ip=leo_link0[0][2]
-	    else:
-	        home_agent_ip=leo_link0[0][7]
+        if leo_link0[0][5]=='geo':
+            home_agent_ip=leo_link0[0][2]
+        else:
+            home_agent_ip=leo_link0[0][7]
 
-	    if leo_link0[0][5]=='geo':
-	        home_address_ip=leo_link0[0][7]
-	    else:
-	        home_address_ip=leo_link0[0][2]
+        if leo_link0[0][5]=='geo':
+            home_address_ip=leo_link0[0][7]
+        else:
+            home_address_ip=leo_link0[0][2]
 
-	    if_gw_table={}
-	    for i in range(len(leo_links)):
-	        if leo_links[i][5]=='geo':
-		    if_gw_table[leo_links[i][8]]=leo_links[i][2]
-	        else:
-		    if_gw_table[leo_links[i][3]]=leo_links[i][7]
+        if_gw_table={}
+        for i in range(len(leo_links)):
+            if leo_links[i][5]=='geo':
+            if_gw_table[leo_links[i][8]]=leo_links[i][2]
+            else:
+            if_gw_table[leo_links[i][3]]=leo_links[i][7]
 
-	    CONFIG_FILE = "mn.cfg"
+        CONFIG_FILE = "mn.cfg"
 
-	    spi = 256
-	    key = 1234567812345678
-	    home_agent = home_agent_ip
-	    home_address = home_address_ip
-	    if_gateways = if_gw_table
+        spi = 256
+        key = 1234567812345678
+        home_agent = home_agent_ip
+        home_address = home_address_ip
+        if_gateways = if_gw_table
 
-	    conf = ConfigParser.ConfigParser()
+        conf = ConfigParser.ConfigParser()
 
-	    cfgfile = open(CONFIG_FILE,'w')
+        cfgfile = open(CONFIG_FILE,'w')
 
-	    conf.add_section("MobileNodeAgent")
+        conf.add_section("MobileNodeAgent")
 
-	    conf.set("MobileNodeAgent", "SPI", spi)
-	    conf.set("MobileNodeAgent", "KEY", key)
-	    conf.set("MobileNodeAgent", "HOME_AGENT", home_agent)
-	    conf.set("MobileNodeAgent", "HOME_ADDRESS", home_address)
-	    conf.set("MobileNodeAgent", "IF_GATEWAYS", if_gateways)
+        conf.set("MobileNodeAgent", "SPI", spi)
+        conf.set("MobileNodeAgent", "KEY", key)
+        conf.set("MobileNodeAgent", "HOME_AGENT", home_agent)
+        conf.set("MobileNodeAgent", "HOME_ADDRESS", home_address)
+        conf.set("MobileNodeAgent", "IF_GATEWAYS", if_gateways)
 
-	    conf.write(cfgfile)
+        conf.write(cfgfile)
 
-	    cfgfile.close()
+        cfgfile.close()
 
-    else:
-	    c5 = db1.cursor()
-	    c5.execute("select * from link_table1 where destport like '%s' AND sourcetype='leo'"%hostname)
-	    geo_links = c5.fetchall()
-	    c6 = db1.cursor()
-	    c6.execute("select * from link_table1 where sourceport like '%s' AND desttype='leo'"%hostname)
-	    geo_links += c6.fetchall()
+        else:
+        c5 = db1.cursor()
+        c5.execute("select * from link_table1 where destport like '%s' AND sourcetype='leo'"%hostname)
+        geo_links = c5.fetchall()
+        c6 = db1.cursor()
+        c6.execute("select * from link_table1 where sourceport like '%s' AND desttype='leo'"%hostname)
+        geo_links += c6.fetchall()
 
-	    for i in range(len(geo_links)):
-		    if geo_links[i][5] == 'geo':
-		        address_ip = geo_links[i][2]
-		    else:
-		        address_ip = geo_links[i][7]
+        for i in range(len(geo_links)):
+            if geo_links[i][5] == 'geo':
+                address_ip = geo_links[i][2]
+            else:
+                address_ip = geo_links[i][7]
 
-	    #creat ha.cfg
-	    CONFIG_FILE = "ha.cfg"
+        #creat ha.cfg
+        CONFIG_FILE = "ha.cfg"
 
-	    address = address_ip
-	    auth_table = {256:"1234567812345678"}
+        address = address_ip
+        auth_table = {256:"1234567812345678"}
 
 
-	    conf = ConfigParser.ConfigParser()
+        conf = ConfigParser.ConfigParser()
 
-	    cfgfile = open(CONFIG_FILE,'w')
+        cfgfile = open(CONFIG_FILE,'w')
 
-	    conf.add_section("HomeAgent")
+        conf.add_section("HomeAgent")
 
-	    conf.set("HomeAgent", "ADDRESS", address)
-	    conf.set("HomeAgent", "AUTH_TABLE", auth_table)
+        conf.set("HomeAgent", "ADDRESS", address)
+        conf.set("HomeAgent", "AUTH_TABLE", auth_table)
 
-	    conf.write(cfgfile)
+        conf.write(cfgfile)
 
-	    cfgfile.close()
+        cfgfile.close()
+        os.system('python home_agent.py ha.cfg &')
 
     db1.close()
 
