@@ -1,0 +1,635 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: leo11
+spec:
+  imagePullSecrets:
+    - name: registry-key
+  containers:
+  - name: leo11
+    image: quagga_snmp:v7
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/boot_snmp.sh"]
+    env:
+    - name: TZ
+      value: Asia/Shanghai
+    ports:
+    - name: client
+      containerPort: 8007
+    - name: server
+      containerPort: 8003  
+    volumeMounts:
+    - name: traffic2
+      mountPath: /home/traffic
+    securityContext:
+      privileged: true
+
+  - name: capture11
+    image: tshark:v2.0
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/start.sh"]
+    resources: {}
+    volumeMounts:
+    - name: traffic
+      mountPath: /home/traffic
+    - name: tmp
+      mountPath: /tmp
+    securityContext:
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  priority: 0
+  volumes:
+  - name: traffic
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo11
+  - name: tmp
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo11
+  - name: traffic2
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo11
+
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: leo12
+spec:
+  imagePullSecrets:
+    - name: registry-key
+  containers:
+  - name: leo12
+    image: quagga_snmp:video
+#    image: 10.12.1.225/devel/node_ospf:v7
+    imagePullPolicy: IfNotPresent
+    command: ["/bin/bash","/boot_snmp.sh"]
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    env:
+    - name: TZ
+      value: Asia/Shanghai
+    - name: DISPLAY
+      value: unix:10.0
+    ports:
+    - name: client
+      containerPort: 8007
+    - name: server
+      containerPort: 8003  
+    - name: video
+      containerPort: 1935
+      hostPort: 1935
+    - name: vid
+      containerPort: 8080
+      hostPort: 8000
+    volumeMounts:
+    - name: traffic2
+      mountPath: /home/traffic
+    - name: traffic3
+      mountPath: /tmp/.X11-unix
+    securityContext:
+      privileged: true
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
+
+  - name: capture12
+    image: tshark:v2.0
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/start.sh"]
+    resources: {}
+    volumeMounts:
+    - name: traffic
+      mountPath: /home/traffic
+    - name: tmp
+      mountPath: /tmp
+    securityContext:
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  priority: 0
+  volumes:
+  - name: traffic
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo12
+  - name: traffic3
+    hostPath:
+      path: /tmp/.X11-unix
+  - name: tmp
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo12
+  - name: traffic2
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo12
+
+
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: leo13
+spec:
+  imagePullSecrets:
+    - name: registry-key
+  containers:
+  - name: leo13
+    image: quagga_snmp:video
+#    image: 10.12.1.225/devel/node_ospf:v7
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/boot_snmp.sh"]
+    env:
+    - name: TZ
+      value: Asia/Shanghai
+    - name: DISPLAY
+      value: unix:10.0
+    ports:
+    - name: client
+      containerPort: 8007
+    - name: server
+      containerPort: 8003  
+    - name: video
+      containerPort: 1900
+      hostPort: 1900
+    - name: vid
+      containerPort: 8080
+      hostPort: 8001
+    volumeMounts:
+    - name: traffic2
+      mountPath: /home/traffic
+    - name: traffic3
+      mountPath: /tmp/.X11-unix
+    securityContext:
+      privileged: true
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
+
+
+  - name: capture13
+    image: tshark:v2.0
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/start.sh"]
+    resources: {}
+    volumeMounts:
+    - name: traffic
+      mountPath: /home/traffic
+    - name: tmp
+      mountPath: /tmp/.X11-unix
+    securityContext:
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  priority: 0
+  volumes:
+  - name: traffic
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo13
+  - name: traffic3
+    hostPath:
+      path: /tmp/.X11-unix
+  - name: tmp
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo13
+  - name: traffic2
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo13
+
+
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: leo14
+spec:
+  imagePullSecrets:
+    - name: registry-key
+  containers:
+  - name: leo14
+    image: quagga_snmp:v7
+#    image: 10.12.1.225/devel/node_ospf:v7
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/boot_snmp.sh"]
+    env:
+    - name: TZ
+      value: Asia/Shanghai
+    ports:
+    - name: client
+      containerPort: 8007
+    - name: server
+      containerPort: 8003  
+    volumeMounts:
+    - name: traffic2
+      mountPath: /home/traffic
+    securityContext:
+      privileged: true
+
+
+  - name: capture14
+    image: tshark:v2.0
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/start.sh"]
+    resources: {}
+    volumeMounts:
+    - name: traffic
+      mountPath: /home/traffic
+    - name: tmp
+      mountPath: /tmp
+    securityContext:
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  priority: 0
+  volumes:
+  - name: traffic
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo14
+  - name: tmp
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo14
+  - name: traffic2
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo14
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: leo15
+spec:
+  imagePullSecrets:
+    - name: registry-key
+  containers:
+  - name: leo15
+    image: quagga_snmp:v7
+#    image: 10.12.1.225/devel/node_ospf:v7
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/boot_snmp.sh"]
+    env:
+    - name: TZ
+      value: Asia/Shanghai
+    ports:
+    - name: client
+      containerPort: 8007
+    - name: server
+      containerPort: 8003  
+    volumeMounts:
+    - name: traffic2
+      mountPath: /home/traffic
+    securityContext:
+      privileged: true
+
+
+  - name: capture15
+    image: tshark:v2.0
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/start.sh"]
+    resources: {}
+    volumeMounts:
+    - name: traffic
+      mountPath: /home/traffic
+    - name: tmp
+      mountPath: /tmp
+    securityContext:
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  priority: 0
+  volumes:
+  - name: traffic
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo15
+  - name: tmp
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo15
+  - name: traffic2
+    hostPath:
+      path: /mnt/hddisk1/pod_10/leo15
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: geo1
+spec:
+  imagePullSecrets:
+    - name: registry-key
+  containers:
+  - name: geo1
+    image: quagga_snmp:v7
+#    image: 10.12.1.225/devel/node_ospf:v7
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/boot_script.sh"]
+    env:
+    - name: TZ
+      value: Asia/Shanghai
+    ports:
+    - name: client
+      containerPort: 8007
+    - name: server
+      containerPort: 8003  
+    volumeMounts:
+    - name: traffic2
+      mountPath: /home/traffic
+    securityContext:
+      privileged: true
+
+
+  - name: capture1
+    image: tshark:v2.0
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/start.sh"]
+    resources: {}
+    volumeMounts:
+    - name: traffic
+      mountPath: /home/traffic
+    - name: tmp
+      mountPath: /tmp
+    securityContext:
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  priority: 0
+  volumes:
+  - name: traffic
+    hostPath:
+      path: /mnt/hddisk1/pod_10/geo1
+  - name: tmp
+    hostPath:
+      path: /mnt/hddisk1/pod_14/geo1
+  - name: traffic2
+    hostPath:
+      path: /mnt/hddisk1/pod_14/geo1
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: geo2
+spec:
+  imagePullSecrets:
+    - name: registry-key
+  containers:
+  - name: geo2
+    image: quagga_snmp:v7
+#    image: 10.12.1.225/devel/node_ospf:v7
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/boot_script.sh"]
+    env:
+    - name: TZ
+      value: Asia/Shanghai
+    ports:
+    - name: client
+      containerPort: 8007
+    - name: server
+      containerPort: 8003  
+    volumeMounts:
+    - name: traffic2
+      mountPath: /home/traffic
+    securityContext:
+      privileged: true
+
+
+  - name: capture2
+    image: tshark:v2.0
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/start.sh"]
+    resources: {}
+    volumeMounts:
+    - name: traffic
+      mountPath: /home/traffic
+    - name: tmp
+      mountPath: /tmp
+    securityContext:
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  priority: 0
+  volumes:
+  - name: traffic
+    hostPath:
+      path: /mnt/hddisk1/pod_10/geo2
+  - name: tmp
+    hostPath:
+      path: /mnt/hddisk1/pod_10/geo2
+  - name: traffic2
+    hostPath:
+      path: /mnt/hddisk1/pod_10/geo2
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: geo3
+spec:
+  imagePullSecrets:
+    - name: registry-key
+  containers:
+  - name: geo3
+    image: quagga_snmp:v7
+#    image: 10.12.1.225/devel/node_ospf:v7
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/boot_script.sh"]
+    env:
+    - name: TZ
+      value: Asia/Shanghai
+    ports:
+    - name: client
+      containerPort: 8007
+    - name: server
+      containerPort: 8003  
+    volumeMounts:
+    - name: traffic2
+      mountPath: /home/traffic
+    securityContext:
+      privileged: true
+
+
+  - name: capture3
+    image: tshark:v2.0
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/start.sh"]
+    resources: {}
+    volumeMounts:
+    - name: traffic
+      mountPath: /home/traffic
+    - name: tmp
+      mountPath: /tmp
+    securityContext:
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  priority: 0
+  volumes:
+  - name: traffic
+    hostPath:
+      path: /mnt/hddisk1/pod_10/geo3
+  - name: tmp
+    hostPath:
+      path: /mnt/hddisk1/pod_10/geo3
+  - name: traffic2
+    hostPath:
+      path: /mnt/hddisk1/pod_10/geo3
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: geo4
+spec:
+  imagePullSecrets:
+    - name: registry-key
+  containers:
+  - name: geo4
+    image: quagga_snmp:v7
+#    image: 10.12.1.225/devel/node_ospf:v7
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/boot_script.sh"]
+    env:
+    - name: TZ
+      value: Asia/Shanghai
+    ports:
+    - name: client
+      containerPort: 8007
+    - name: server
+      containerPort: 8003  
+    volumeMounts:
+    - name: traffic2
+      mountPath: /home/traffic
+    securityContext:
+      privileged: true
+
+
+  - name: capture4
+    image: tshark:v2.0
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/start.sh"]
+    resources: {}
+    volumeMounts:
+    - name: traffic
+      mountPath: /home/traffic
+    - name: tmp
+      mountPath: /tmp
+    securityContext:
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  priority: 0
+  volumes:
+  - name: traffic
+    hostPath:
+      path: /mnt/hddisk1/pod_10/geo4
+  - name: tmp
+    hostPath:
+      path: /mnt/hddisk1/pod_10/geo4
+  - name: traffic2
+    hostPath:
+      path: /mnt/hddisk1/pod_10/geo4
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: geo5
+spec:
+  imagePullSecrets:
+    - name: registry-key
+  containers:
+  - name: geo5
+    image: quagga_snmp:v7
+#    image: 10.12.1.225/devel/node_ospf:v7
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/boot_script.sh"]
+    env:
+    - name: TZ
+      value: Asia/Shanghai
+    ports:
+    - name: client
+      containerPort: 8007
+    - name: server
+      containerPort: 8003  
+    volumeMounts:
+    - name: traffic2
+      mountPath: /home/traffic
+    securityContext:
+      privileged: true
+
+
+  - name: capture5
+    image: tshark:v2.0
+    imagePullPolicy: IfNotPresent
+#    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+    command: ["/bin/bash","/start.sh"]
+    resources: {}
+    volumeMounts:
+    - name: traffic
+      mountPath: /home/traffic
+    - name: tmp
+      mountPath: /tmp
+    securityContext:
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  priority: 0
+  volumes:
+  - name: traffic2
+    hostPath:
+      path: /mnt/hddisk1/pod_10/geo5
+  - name: tmp
+    hostPath:
+      path: /mnt/hddisk1/pod_10/geo5
+  - name: traffic
+    hostPath:
+      path: /mnt/hddisk1/pod_10/geo5
+
