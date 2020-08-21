@@ -363,7 +363,7 @@ def PortifInDiscards(i,counter):
     dict["port"] = port
     dict["collection couter"] = counter
     dict["indiscards"] = str(indiscards*100)+'%'
-    dicr["time"] = time_cur
+    dict["time"] = time_cur
     j = json.dumps(dict)
     # save the data to elasticseearch
     index_name = 'indiscards'
