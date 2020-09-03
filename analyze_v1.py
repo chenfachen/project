@@ -871,7 +871,6 @@ def mk_sh():
     res_link = mysql_sh.fetchAll("id,sourceip,destip,sourceport,destport", "selectlink")
 
 
-    db2 = pymysql.connect(host=mysql_addr, port=mysql_port, user=mysql_account, password=mysql_pw, database=mysql_name)
     p = os.popen("hostname")
     line = p.readline()
     hostname=line.strip()
@@ -880,14 +879,7 @@ def mk_sh():
         hostname=hostname.lower()
         #print('%s'%hostname)
         #修改
-        c10 = db2.cursor()
-        c10.execute("select id,sourceip,sourceport,sourcetype,destip,destport,desttype from selectlink where destport like '%s' AND sourcetype='geo'"%hostname1)
-        leo_links = c10.fetchall()
-        c10.close()
-        c11 = db2.cursor()
-        c11.execute("select id,sourceip,sourceport,sourcetype,destip,destport,desttype from selectlink where sourceport like '%s' AND desttype='geo'"%hostname1)
-        leo_links += c11.fetchall()
-        c11.close()
+
 
         sp=[]
         dp=[]
@@ -945,17 +937,13 @@ def mk_sh():
         gw=[]
         for k in range(len(flow)):
             gw.append(link_dic[flow[k][0]])
-            for i in range(len(leo_links)):
-                if leo_links[i][1] == gw[0][0]:
-                    netcard = leo_links[i][2]
-                else:
-                    netcard = leo_links[i][5]
+
             f.write("route add -net 10.0.0.0/16 gw "+gw[0][0]+"\n" )
             f.write("route add -net 10.0.0.0/16 gw "+gw[0][1]+"\n" )
             f.write("\n")
             #f.write("cd /home/MobileIP-master \n")
             f.write("python /home/MobileIP-master/"
-                    "mn_agent.py register " + netcard + "\n")
+                    "mn_agent.py register " + gw[0][2] + "\n")
             f.write("sleep "+str(int(flow[k][2])-int(flow[k][1]))+"\n")
             f.write("\n")
             f.write("route del -net 10.0.0.0/16\n")
